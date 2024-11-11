@@ -32,4 +32,10 @@ class ShellGUI:
     def display(self) -> None:
         
         self.flush()
-        ...
+        self.display_board()
+
+
+    def display_board(self) -> None:
+
+        board: GameBoard = self.getTetrisGame().getGameBoard()
+        print(board.getGameMatrixWithCurrentPiece())

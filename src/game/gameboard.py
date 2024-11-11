@@ -50,6 +50,18 @@ class GameBoard:
     def setGameMatrix(self, new_matrix: GameMatrix) -> None:
         self._gameMatrix = new_matrix
 
+    def getGameMatrixWithCurrentPiece(self) -> GameMatrix:
+
+        ret: GameMatrix = copy.deepcopy(self.getGameMatrix())
+        current_piece: Tetramino = self.getCurrent()
+
+        if current_piece:
+            cp_positions: list[Position2D] = current_piece.getAbsoluteCoordinates(topleft=current_piece.getPosition(), shape=current_piece.getShape())
+            for p in cp_positions:
+                ret[p.y][p.x] = 2
+
+        return ret
+
     def getRow(self, row: int) -> list[int]:
         if 0 <= row < self.getHeight():
             return self.getGameMatrix()[row]

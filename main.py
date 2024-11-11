@@ -22,5 +22,16 @@ import time
 
 if __name__ == '__main__':
 
-    game: TetrisGame = TetrisGame()
-    gc: GameController = GameController()
+
+    gb: GameBoard = GameBoard(tetramino=None, width=10, height=22)
+    fac: TetraminoFactory = TetraminoFactory()
+    bag: Bag = Bag()
+    score: Score = Score()
+    gc: GameController = GameController(config=None)
+
+    game: TetrisGame = TetrisGame(game_board=gb, factory=fac, bag=bag, score=score, controller=gc)
+    gui: ShellGUI = ShellGUI(tetris_game=game)
+
+    while 1:
+        gui.display()
+        time.sleep(1/60)

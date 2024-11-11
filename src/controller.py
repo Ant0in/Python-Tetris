@@ -29,7 +29,16 @@ class GameController:
 
     def getConfig(self) -> dict:
         return self._config
-    
+
+    def getCurrentConfig(self) -> dict:
+
+        # Cette fonction existe uniquement pour implémenter les malus d'inversement
+        # des contrôles du joueurs. Ils vont shuffle les contrôles en les inversant par exemple.
+        # TODO:     Créer un nouveau dictionnaire des keybinds et le renvoyer à la place de la config
+        # TODO:     habituelle pendant le temps de la malédiction.
+
+        return self.getConfig()
+
     def getCooldownedKeys(self) -> dict:
         return self._cooldowned_keys
 
@@ -49,7 +58,7 @@ class GameController:
             
     def getUserActions(self) -> Move | Rotation | SpecialAction | None:
 
-        for k, a in self.getConfig().items():
+        for k, a in self.getCurrentConfig().items():
 
             if keyboard.is_pressed(k):
 
