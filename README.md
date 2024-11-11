@@ -11,7 +11,7 @@ Make sure you have `Python >= 3.11` installed.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Ant0in/...
+   git clone https://github.com/Ant0in/Python-Tetris.git
    ```
 
 2. Navigate to the project directory:
