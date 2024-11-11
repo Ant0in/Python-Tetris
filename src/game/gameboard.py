@@ -11,13 +11,14 @@ import copy
 
 class GameBoard:
 
-    def __init__(self, tetramino: Tetramino | None, width: int = 10, height: int = 22) -> None:
+    def __init__(self, tetramino: Tetramino | None = None, width: int = 10, height: int = 22) -> None:
         
         self._isGameOver: bool = False
         self._current: Tetramino | None = tetramino
         self._width: int = width
         self._height: int = height
         self._gameMatrix: GameMatrix = self.createGameMatrix(width=self.getWidth(), height=self.getHeight())
+
 
     # getters/setters/reset
 
@@ -64,112 +65,72 @@ class GameBoard:
 
     # Move/Rotation + collision methods
 
-    def canMove(self, piece: Tetramino, move: Move) -> bool:
+    def isColliding(self, pos: Position2D, shape: Shape, move: Move | None = None, rotation: Rotation | None = None) -> bool:
+        # On check si la pièce est à une position satisfaisante.
+        
+        move = move if move else Move.NONE
+        rotation = rotation if rotation else Rotation.NONE
 
-        topleft: Position2D = piece.getMovePosition(move=move)
-        shape: Shape = piece.getShape()
+        t: Tetramino = Tetramino(shapeType=None, pos=pos)
+        t.setShape(new_shape=shape)
 
-        for rel_y, row in enumerate(shape):
-            for rel_x, tile in enumerate(row):
+        for p in t.getAbsoluteCoordinates(topleft=t.getMovePosition(move=move), shape=t.getRotateShape(rotation=rotation)):
 
-                abs_x: int = rel_x + topleft.x
-                abs_y: int = rel_y + topleft.y
-                abs_pos: Position2D = Position2D(abs_x, abs_y)
-
-                if tile != 0:
-
-                    # On vérifie que la position existe
-                    if not self.isPositionInMatrix(pos=abs_pos):
-                        return False
+            # On vérifie que la position existe
+            if not self.isPositionInMatrix(pos=p):
+                return False
                     
-                    # On vérifie que si la pièce possède un bloc à la position relative, alors la
-                    # grid possède une place à la position absolue.
-                    if self.getTile(pos=abs_pos) != 0:
-                        return False
+            # On vérifie que si la pièce possède un bloc à la position relative, alors la
+            # grid possède une place à la position absolue.
+            if self.getTile(pos=p) != 0:
+                return False
                     
         return True
+
+    def canMove(self, piece: Tetramino, move: Move) -> bool:
+        return self.isColliding(pos=piece.getPosition(), shape=piece.getShape(), move=move, rotation=None)
+    
+    def canRotate(self, piece: Tetramino, rotation: Rotation) -> bool:
+        return self.isColliding(pos=piece.getPosition(), shape=piece.getShape(), move=None, rotation=rotation)
     
     def tryMoveCurrent(self, move: Move) -> bool:
-
         current_piece: Tetramino = self.getCurrent()    
         possible: bool = self.canMove(piece=current_piece, move=move)
-
-        if possible:
-            current_piece.setPosition(new_pos=current_piece.getMovePosition(move=move))
+        if possible: current_piece.setPosition(new_pos=current_piece.getMovePosition(move=move))
         return possible
 
-    def canRotate(self, piece: Tetramino, rotation: Rotation) -> bool:
-        
-        topleft: Position2D = piece.getPosition()
-        shape: Shape = piece.getRotateShape(rotation=rotation)
-
-        for rel_y, row in enumerate(shape):
-            for rel_x, tile in enumerate(row):
-
-                abs_x: int = rel_x + topleft.x
-                abs_y: int = rel_y + topleft.y
-                abs_pos: Position2D = Position2D(abs_x, abs_y)
-
-                # Si la tile est 0, elle peut très bien être en dehors, on s'en moque.
-                if tile != 0:
-
-                    # Si c'est un bloc, on vérifie que la position existe
-                    if not self.isPositionInMatrix(pos=abs_pos):
-                        return False
-                    
-                    # si la position existe, nn vérifie que la grid possède
-                    # une place à la position absolue.
-                    if self.getTile(pos=abs_pos) != 0:
-                        return False
-                    
-        return True
-    
     def tryRotateCurrent(self, rotation: Rotation) -> bool:
-
         current_piece: Tetramino = self.getCurrent()    
         possible: bool = self.canRotate(piece=current_piece, rotation=rotation)
-
-        if possible:
-            current_piece.setShape(new_shape=current_piece.getRotateShape(rotation=rotation))
+        if possible: current_piece.setShape(new_shape=current_piece.getRotateShape(rotation=rotation))
         return possible
-
-    def isColliding(self, piece: Tetramino) -> bool:
-        # On check si la pièce est à une position satisfaisante sans qu'elle ne bouge.
-        return self.canMove(piece=piece, move=Move.NONE)
 
     def getRowsToObstacle(self, piece: Tetramino) -> int:
         
         rows_count: int = 0
-        test_piece: Tetramino = copy(piece)
+        shape: Shape = piece.getShape()
+        pos: Position2D = piece.getPosition()
 
-        while not self.isColliding(piece=test_piece):
-            
-            current: Position2D = test_piece.getPosition().coords
-            test_piece.setPosition(new_pos=Position2D(current[0], current[1] + 1))
+        while not self.isColliding(pos=pos, shape=shape, move=None, rotation=None):
             rows_count += 1
+            pos = Position2D(pos.x, pos.y + 1)
 
-        del test_piece
         return rows_count
     
     def placePiece(self, piece: Tetramino) -> bool:
 
-        can_place: bool = (not self.isColliding(piece=piece))
+        can_place: bool = (not self.isColliding(pos=piece.getPosition(), shape=piece.getShape(), move=None, rotation=None))
         
         if can_place:
-            
-            topleft: Position2D = piece.getPosition()
-
-            for rel_y, row in enumerate(piece.getShape()):
-                for rel_x, _ in enumerate(row):
-
-                    abs_x: int = rel_x + topleft.x
-                    abs_y: int = rel_y + topleft.y
-                    abs_pos: Position2D = Position2D(abs_x, abs_y)
-                    
-                    self.setTile(pos=abs_pos, value=1)
+            for p in piece.getAbsoluteCoordinates(topleft=piece.getPosition(), shape=piece.getShape()): 
+                self.setTile(pos=p, value=1)
 
         return can_place
     
+    def tryPlaceCurrentPiece(self) -> bool:
+        s: bool = self.placePiece(piece=self.getCurrent())
+        self.deleteCurrent()
+        return s
 
 
     # Matrix management / Line clear

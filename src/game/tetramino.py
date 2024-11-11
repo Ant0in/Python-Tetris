@@ -120,4 +120,17 @@ class Tetramino:
             case Rotation.NONE: return shape
             case _: raise NotImplementedError(f'[E] Unknown rotation type ({rotation}).')
 
+    def getAbsoluteCoordinates(self, topleft: Position2D, shape: Shape) -> list[Position2D]:
 
+        ret: list[Position2D] = list()
+
+        for rel_y, row in enumerate(shape):
+            for rel_x, v in enumerate(row):
+
+                if v != 0:
+                    abs_x: int = rel_x + topleft.x
+                    abs_y: int = rel_y + topleft.y
+                    abs_pos: Position2D = Position2D(abs_x, abs_y)
+                    ret.append(abs_pos)
+
+        return ret
