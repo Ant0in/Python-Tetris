@@ -49,6 +49,12 @@ class Move(Enum):
     RIGHT = 3
 
 
+class SpecialAction(Enum):
+    NONE = 0
+    INSTANT_FALL = 1
+    USE_BAG = 2
+
+
 class Rotation(Enum):
     NONE = 0
     LEFT = 1

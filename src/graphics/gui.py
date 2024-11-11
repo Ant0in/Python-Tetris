@@ -32,6 +32,4 @@ class ShellGUI:
     def display(self) -> None:
         
         self.flush()
-        game: TetrisGame = self.getTetrisGame()
-
-        print('Tetris - 2024 - INFO-F209')
+        ...

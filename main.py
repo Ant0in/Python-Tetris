@@ -15,9 +15,12 @@ from src.common import Position2D, Move, Rotation, ShapeType
 from src.graphics.gui import ShellGUI
 
 
+import time
+
+
+
 
 if __name__ == '__main__':
 
     game: TetrisGame = TetrisGame()
-    gui: ShellGUI = ShellGUI(tetris_game=game)
-    gui.display()
+    gc: GameController = GameController()
