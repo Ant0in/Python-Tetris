@@ -30,7 +30,7 @@ class TetraminoFactory:
         next: Tetramino | None = None
 
         if not self.isPoolEmpty():
-            next = self.getPool().pop(0)
+            next = self.getPool().pop(-1)
 
         if self.isPoolEmpty():
             self.fillPool()
@@ -42,7 +42,7 @@ class TetraminoFactory:
         next: Tetramino | None = None
 
         if not self.isPoolEmpty():
-            next = self.getPool()[0]
+            next = self.getPool()[-1]
 
         return next
 

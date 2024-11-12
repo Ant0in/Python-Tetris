@@ -15,6 +15,9 @@ class Tetramino:
 
     def __repr__(self) -> str:
         return f'Tetramino {self.getType().name} @ {self.getPosition()}'
+    
+    def __eq__(self, other: 'Tetramino') -> bool:
+        return self.getPosition() == other.getPosition() and self.getShape() == other.getShape()
 
     def getPosition(self) -> Position2D:
         return self._position
@@ -96,8 +99,7 @@ class Tetramino:
 
     def reset(self) -> None:
         self.setPosition(new_pos=Position2D(0, 0))
-        self.setType(new_type=None)
-        self.setShape(new_shape=self.generateShapeByType(shapeType=None))
+        self.setShape(new_shape=self.generateShapeByType(shapeType=self.getType()))
 
     def getMovePosition(self, move: Move) -> Position2D:
 
@@ -107,7 +109,7 @@ class Tetramino:
             case Move.LEFT: return Position2D(current_pos.x - 1, current_pos.y)
             case Move.RIGHT: return Position2D(current_pos.x + 1, current_pos.y)
             case Move.DOWN: return Position2D(current_pos.x, current_pos.y + 1)
-            case Move.NONE: return current_pos
+            case Move.NONE: return Position2D(current_pos.x, current_pos.y)
             case _: raise NotImplementedError(f'[E] Unknown direction type ({move}).')
     
     def getRotateShape(self, rotation: Rotation) -> Shape:
@@ -120,7 +122,10 @@ class Tetramino:
             case Rotation.NONE: return shape
             case _: raise NotImplementedError(f'[E] Unknown rotation type ({rotation}).')
 
-    def getAbsoluteCoordinates(self, topleft: Position2D, shape: Shape) -> list[Position2D]:
+    def getAbsoluteCoordinates(self, topleft: Position2D | None = None, shape: Shape | None = None) -> list[Position2D]:
+
+        topleft = topleft if topleft else self.getPosition()
+        shape = shape if shape else self.getShape()
 
         ret: list[Position2D] = list()
 

@@ -17,6 +17,21 @@ from src.common import Position2D, Move, Rotation, ShapeType
 
 class TetrisGame:
 
+
+    SPEED_TABLE: dict = {
+    # Pour un level, combien de frame pour 
+    # effectuer une logique de gravité
+       -1: float('inf'),
+        0: 60,
+        1: 30,
+        2: 15,
+        3: 10,
+        4:  8,
+        5:  6,
+        6:  5
+    }
+
+
     def __init__(self,
                  game_board: GameBoard | None = None,
                  factory: TetraminoFactory | None = None,
@@ -34,6 +49,7 @@ class TetrisGame:
 
         # window/instance features
         self._frame: int = 0
+        self._level: int = 4
 
     def getGameBoard(self) -> GameBoard:
         return self._game_board
@@ -43,7 +59,7 @@ class TetrisGame:
     
     def getBag(self) -> Bag:
         return self._bag
-    
+
     def getScore(self) -> Score:
         return self._score
     
@@ -52,3 +68,20 @@ class TetrisGame:
     
     def getFrame(self) -> int:
         return self._frame
+    
+    def setFrame(self, n: int) -> None:
+        self._frame = n
+
+    def incrementFrame(self) -> None:
+        self.setFrame(self.getFrame() + 1)
+    
+    def getLevel(self) -> int:
+        return self._level
+    
+    def shouldApplyGravity(self) -> bool:
+
+        frame: int = self.getFrame()
+        frame_quantum: int = self.SPEED_TABLE[self.getLevel()]
+        return (frame % frame_quantum == 0 and frame > frame_quantum)
+
+

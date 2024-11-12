@@ -4,11 +4,7 @@ from enum import Enum
 from typing import Any, List
 
 
-# Alias pour les shapes
-GameMatrix = List[List[int]]
-Shape = List[List[int]]
-
-
+EMPTY_TILE: int = 0
 
 class Position2D:
 
@@ -59,5 +55,12 @@ class Rotation(Enum):
     NONE = 0
     LEFT = 1
     RIGHT = 2
+
+
+
+# Alias pour les shapes
+GameMatrix = List[List[int]]
+Shape = List[List[int]]
+Action = Move | Rotation | SpecialAction | None
 
 
