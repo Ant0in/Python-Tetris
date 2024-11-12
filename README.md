@@ -1,9 +1,26 @@
 # Python Tetris - 2024
 
 
+## Description
+
+This project implements a **Tetris Game** with a focus on **OOP** methodology. For more details, please refer to `Projet 2 - INFOF209`.
+
+<p align="center">
+  <img src="./misc/game.png" alt="screen" width="auto" height="300"/>
+  <br/>
+  <strong>Tetris in Terminal</strong>
+</p>
+
 ## Usage
 
 Make sure you have `Python >= 3.11` installed.
+
+### Controls
+
+- `<LEFT>, <RIGHT>, <DOWN>` keys to move piece.
+- `<C>, <V>` keys to rotate piece.
+- `<SPACE>` key to make the piece fall instantly.
+- `<B>` to use the hold option.
 
 
 ### Running the Project
@@ -29,7 +46,7 @@ Make sure you have `Python >= 3.11` installed.
 4. Run the project:
 
    ```bash
-   python ".\main.py" (-options)
+   python ".\main.py"
    ```
 
 ## License
