@@ -1,6 +1,6 @@
 
 
-from src.common import Move, Rotation, SpecialAction
+from src.common import Move, Rotation, SpecialAction, Action
 
 import keyboard
 
@@ -20,7 +20,8 @@ class GameController:
         'v': Rotation.RIGHT,
     }
 
-    COOLDOWN_TIME: int = 5
+    SHORT_COOLDOWN: int = 5
+    LONG_COOLDOWN: int = 10
 
     def __init__(self, config: dict | None = None) -> None:
         
@@ -43,7 +44,12 @@ class GameController:
         return self._cooldowned_keys
 
     def putKeyInCooldown(self, key: str) -> None:
-        self.getCooldownedKeys()[key] = GameController.COOLDOWN_TIME
+
+        action: Action = self.getCurrentConfig()[key]
+        if isinstance(action, (SpecialAction, Rotation)):
+            self.getCooldownedKeys()[key] = GameController.LONG_COOLDOWN
+        elif isinstance(action, (Move)):
+            self.getCooldownedKeys()[key] = GameController.SHORT_COOLDOWN
 
     def handleCooldown(self) -> None:
 
