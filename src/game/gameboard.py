@@ -150,7 +150,7 @@ class GameBoard:
         
         temp: Tetramino = Tetramino(shapeType=None, pos=piece.getPosition())
         temp.setShape(new_shape=piece.getShape())
-        rowc: int = 0
+        rowc: int = -1
 
         while not self.isColliding(pos=temp.getPosition(), shape=temp.getShape(), move=None, rotation=None):
             rowc += 1
@@ -188,10 +188,7 @@ class GameBoard:
         return could_place
 
     def spawnPiece(self, t: Tetramino, tl_spawnbox: Position2D) -> bool:
-        
-        if self.getCurrent():
-            return False  # Déjà une pièce current
-        
+          
         t.setPosition(new_pos=tl_spawnbox)  # On met la pièce dans la spawnbox
         does_collide: bool = self.isColliding(pos=t.getPosition(), shape=t.getShape(), move=None, rotation=None)
         

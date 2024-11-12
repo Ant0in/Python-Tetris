@@ -62,5 +62,6 @@ class Rotation(Enum):
 GameMatrix = List[List[int]]
 Shape = List[List[int]]
 Action = Move | Rotation | SpecialAction | None
+SPAWN_BOX: Position2D = Position2D(3, 0)
 
 

@@ -5,7 +5,7 @@ from src.game.tetris_game import TetrisGame
 
 from src.controller import GameController
 
-from src.common import  Action
+from src.common import  Action, SPAWN_BOX
 from src.common import Position2D, Move, Rotation, SpecialAction
 
 import sys
@@ -90,20 +90,21 @@ class GameEngine:
     @staticmethod
     def handle_placing_piece(game: TetrisGame) -> bool:
         
-        # Si il n'y a pas de pièce à placer, alors sucessfull
+        # Si il n'y a pas de pièce à placer, alors on ne place pas de pièce.
         if not game.getGameBoard().getCurrent():
-            return True
+            return False
         
-        could_place: bool = game.getGameBoard().tryPlaceCurrentPiece()
+        # Si jamais on peut encore faire tomber la pièce, alors on ne la place pas.
+        rowsToObstable: int = game.getGameBoard().getRowsToObstacle(piece=game.getGameBoard().getCurrent())
 
-        # Si on n'a pas pu placer, alors il y'a qqch dans le spawnbox.
-        if not could_place:
-            game.getGameBoard().setGameOver(flag=True)
+        if rowsToObstable > 0:
+            return False
+        placed_piece: bool = game.getGameBoard().tryPlaceCurrentPiece()
 
         # Une fois qu'on a placé une pièce, le bag redevient utilisable.
         game.getBag().setUsableFlag(True)
 
-        return could_place
+        return placed_piece
 
     @staticmethod
     def handle_spawn(game: TetrisGame, t: Tetramino | None = None) -> None:
@@ -113,7 +114,7 @@ class GameEngine:
 
             # Si pas de paramètre pour la pièce à spawn, par défaut dans la factory.
             if not t: t = game.getFactory().popPiece()
-            game.getGameBoard().spawnPiece(t=t, tl_spawnbox=Position2D(3, 0))  # TODO : SPAWNBOX
+            game.getGameBoard().spawnPiece(t=t, tl_spawnbox=SPAWN_BOX)
 
     @staticmethod
     def handle_gamelogic(game: TetrisGame) -> None:
@@ -125,7 +126,7 @@ class GameEngine:
         GameEngine.handle_score(game=game, lines_cleared=lines_cleared)
 
         # Dans un troisième temps, on gère le spawn des pièces.
-        GameEngine.handle_spawn(game=game)
+        GameEngine.handle_spawn(game=game, t=None)
 
         # Dans un quatrième temps, on vérifie que la partie n'est pas GameOver.
         if game.getGameBoard().isGameOver(): GameEngine.handle_gameover(game=game)
@@ -137,8 +138,10 @@ class GameEngine:
 
     @staticmethod
     def handle_score(game: TetrisGame, lines_cleared: int) -> None:
-        # TODO : Score Handling
-        ...
+
+        game.incrementLinesCleared(q=lines_cleared)
+        game.getScore().updateScore(lines_cleared=lines_cleared, level=game.getLevel())
+        if game.shouldLevelUp(): game.incrementLevel(q=1)
 
     @staticmethod
     def handling_routine(game: TetrisGame) -> None:
@@ -147,9 +150,9 @@ class GameEngine:
         action: Action = GameEngine.handle_polling(game=game)
         could_move: bool = GameEngine.handle_action(game=game, action=action)
 
-        # --- Gravity routine ---
-        could_fall: bool = GameEngine.handle_falling_piece(game=game)
-        if not could_fall: GameEngine.handle_placing_piece(game=game)
+        # --- Gravity / Placing routine ---
+        piece_fell: bool = GameEngine.handle_falling_piece(game=game)
+        if not piece_fell: GameEngine.handle_placing_piece(game=game)
 
         # --- Logic routine ---
         GameEngine.handle_gamelogic(game=game)

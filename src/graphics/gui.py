@@ -49,15 +49,18 @@ class ShellGUI:
         board: list[str] = self.get_board_display()
         bag: list[str] = self.get_single_piece_display(title='HOLD', piece=self.getTetrisGame().getBag().getStoredPiece())
         next_piece: list[str] = self.get_single_piece_display(title='NEXT', piece=self.getTetrisGame().getFactory().whatIsNextPiece())
+        score: list[str] = self.get_score_display()
 
         space: int = 6
-        bag_start: int = 1
-        next_start: int = 7
+        bag_start: int = 7
+        next_start: int = 1
+        score_start: int = 14
 
         for i in range(len(board)):
             print(board[i], end=' '*space)
             if bag_start <= i < bag_start + len(bag): print(bag[i - bag_start], end='')
             if next_start <= i < next_start + len(next_piece): print(next_piece[i - next_start], end='')
+            if score_start <= i < score_start + len(score): print(score[i - score_start], end='')
             print('')
 
     def get_board_display(self, piece_thickness: int = 2) -> str:
@@ -103,4 +106,10 @@ class ShellGUI:
 
         return [border, title] + ret + [border]
 
+    def get_score_display(self) -> list[str]:
+
+        return [
+            '== SCORE ==',
+            f'>> {self.getTetrisGame().getScore().getScore()}'
+        ]
 

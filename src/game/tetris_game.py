@@ -19,17 +19,13 @@ class TetrisGame:
 
 
     SPEED_TABLE: dict = {
-    # Pour un level, combien de frame pour 
-    # effectuer une logique de gravité
-       -1: float('inf'),
-        0: 60,
-        1: 30,
-        2: 15,
-        3: 10,
-        4:  8,
-        5:  6,
-        6:  5
-    }
+        0: 48, 1: 43, 2: 38, 3: 33, 4: 28, 5: 23, 6: 18, 7: 13, 8: 8, 9: 6,
+        10: 5, 11: 5, 12: 5,
+        13: 4, 14: 4, 15: 4,
+        16: 3, 17: 3, 18: 3,
+        19: 2, 20: 2, 21: 2, 22: 2, 23: 2, 24: 2, 25: 2, 26: 2, 27: 2, 28: 2,
+        29: 1}
+    LINES_TO_LEVELUP: int = 10
 
 
     def __init__(self,
@@ -49,7 +45,8 @@ class TetrisGame:
 
         # window/instance features
         self._frame: int = 0
-        self._level: int = 4
+        self._level: int = 0
+        self._lines_cleared: int = 0
 
     def getGameBoard(self) -> GameBoard:
         return self._game_board
@@ -78,10 +75,28 @@ class TetrisGame:
     def getLevel(self) -> int:
         return self._level
     
+    def setLevel(self, n: int) -> None:
+        self._level = n
+
+    def incrementLevel(self, q: int = 1) -> None:
+        self.setLevel(self.getLevel() + q)
+
+    def getLinesCleared(self) -> int:
+        return self._lines_cleared
+    
+    def setLinesCleared(self, n: int) -> None:
+        self._lines_cleared = n
+
+    def incrementLinesCleared(self, q: int) -> None:
+        self.setLinesCleared(self.getLinesCleared() + q)
+    
     def shouldApplyGravity(self) -> bool:
 
         frame: int = self.getFrame()
-        frame_quantum: int = self.SPEED_TABLE[self.getLevel()]
-        return (frame % frame_quantum == 0 and frame > frame_quantum)
+        frame_quantum: int = self.SPEED_TABLE.get(self.getLevel(), 1)
+        return (frame % frame_quantum == 0 and frame >= frame_quantum)
+
+    def shouldLevelUp(self) -> bool:
+        return self.getLinesCleared() // self.LINES_TO_LEVELUP != self.getLevel()
 
 
